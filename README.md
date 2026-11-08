@@ -6,7 +6,9 @@ business findings and recommendations.
 
 **Business question:** *Where is the marketplace losing revenue and customer goodwill, and what should it fix first?*
 
-## Key findings (phase 1)
+## Key findings
+
+### Phase 1: performance and service
 
 | | Finding |
 |---|---|
@@ -18,16 +20,39 @@ business findings and recommendations.
 
 ![Share of low reviews by delivery timing](outputs/charts/02_low_reviews_by_delivery.png)
 
-➡️ **Full write-up with recommendations and limitations: [docs/phase1_findings.md](docs/phase1_findings.md)**
+➡️ **Full write-up: [docs/phase1_findings.md](docs/phase1_findings.md)**
+
+### Phase 2: customer segmentation
+
+| | Finding |
+|---|---|
+| 💰 | **Lapsing big spenders** are 22.7% of customers but hold **41.1% of customer spend**, the clearest win-back target. |
+| 💳 | **High-value instalment buyers** (15.6% of customers, 7.8 instalments on average) generate **35.5% of spend**. |
+| 😠 | About **1 in 6 customers had a bad experience**, and clustering splits them into two distinct problems: **delivery failures** (81% got a late order) and **unhappy despite good delivery** (only 10% did), which points to product and seller issues. |
+
+![Behavioural customer segments](outputs/charts/08_customer_clusters.png)
+
+➡️ **Full write-up: [docs/phase2_findings.md](docs/phase2_findings.md)**
+
+### Power BI dashboard
+
+A four-page dashboard (executive overview, delivery and satisfaction, customer segments,
+seller scorecard) built on an exported star schema, with DAX measures and a custom theme.
+See the **[build guide](docs/powerbi_guide.md)** and the [`powerbi`](powerbi) folder.
 
 ## What this project demonstrates
 
 - **SQL data modelling:** a layered model (raw → staging → marts) with fact and
   dimension tables, window functions, CTEs and deduplication logic.
-- **Data quality testing:** 12 automated tests (uniqueness, referential integrity,
+- **Data quality testing:** 14 automated tests (uniqueness, referential integrity,
   revenue reconciliation, valid ranges) that run on every build.
+- **Customer segmentation:** RFM scoring adapted for a low-repeat marketplace, plus
+  k-means clustering in Python (scikit-learn) with a documented choice of k.
+- **BI modelling:** a Power BI star schema, date table and DAX measures (YoY growth,
+  late share of low reviews, segment share of spend).
 - **Analytical judgement:** e.g. separating same-day split baskets from genuine return
-  visits, and limiting trends to complete months.
+  visits, limiting trends to complete months, and choosing 5 clusters over the
+  statistically "best" 3 because they lead to different actions.
 - **Communication:** findings written for a business audience, with clear caveats.
 
 ## Data model
@@ -39,11 +64,16 @@ data/raw/*.csv ──load_raw.py──▶ raw_* tables (as-is copies of the sour
                                 stg_* views
                                    │
                          sql/marts ▼  analysis-ready tables
-          fct_orders · fct_order_items · dim_customers · dim_sellers · dim_products · dim_geolocation
+          fct_orders · fct_order_items · dim_customers · dim_sellers · dim_products
+          dim_geolocation · dim_states · mart_customer_features (RFM)
                                    │
-                         sql/tests ▼  12 data quality checks (build fails if any fail)
+                         sql/tests ▼  14 data quality checks (build fails if any fail)
                                    │
-                      sql/analysis ▼  10 business questions → outputs/tables + outputs/charts
+              segment_customers.py ▼  k-means segments → customer_segments
+                                   │
+                      sql/analysis ▼  13 business questions → outputs/tables + outputs/charts
+                                   │
+                 export_powerbi.py ▼  star-schema CSVs → Power BI dashboard
 ```
 
 | Table | Grain | Used for |
@@ -54,6 +84,9 @@ data/raw/*.csv ──load_raw.py──▶ raw_* tables (as-is copies of the sour
 | `dim_sellers` | one row per seller | seller performance |
 | `dim_products` | one row per product | categories (English names) |
 | `dim_geolocation` | one row per zip prefix | maps (later phases) |
+| `dim_states` | one row per state | state names and macro-regions |
+| `mart_customer_features` | one row per customer | segmentation features, RFM scores and segments |
+| `customer_segments` | one row per customer | k-means behavioural segment (from Python) |
 
 ### Data cleaning decisions
 
@@ -78,6 +111,9 @@ data/raw/*.csv ──load_raw.py──▶ raw_* tables (as-is copies of the sour
 | 8 | Do sellers with more late deliveries get worse reviews? | [08_seller_service_quality](sql/analysis/08_seller_service_quality.sql) |
 | 9 | How does delivery vary by state? | [09_state_delivery](sql/analysis/09_state_delivery.sql) |
 | 10 | How do customers pay? | [10_payment_methods](sql/analysis/10_payment_methods.sql) |
+| 11 | What are the RFM segments worth? | [11_rfm_segments](sql/analysis/11_rfm_segments.sql) |
+| 12 | What do the behavioural segments look like? | [12_customer_clusters](sql/analysis/12_customer_clusters.sql) |
+| 13 | Which categories over-index among unhappy customers? | [13_unhappy_segment_drivers](sql/analysis/13_unhappy_segment_drivers.sql) |
 
 ## How to run it
 
@@ -88,12 +124,20 @@ pip install -r requirements.txt
 ```
 
 1. Download the [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) from Kaggle and put the 9 CSV files in `data/raw/`. (The data is not committed to this repo.)
-2. Run the pipeline:
+2. Run the whole pipeline with one command:
 
 ```bash
-python scripts/load_raw.py      # load CSVs into data/olist.db (SQLite)
-python scripts/build.py         # build models and run the data quality tests
-python scripts/run_analysis.py  # run the analysis, save tables and charts
+python scripts/run_all.py
+```
+
+or step by step:
+
+```bash
+python scripts/load_raw.py           # load CSVs into data/olist.db (SQLite)
+python scripts/build.py              # build models and run the data quality tests
+python scripts/segment_customers.py  # k-means customer segmentation
+python scripts/run_analysis.py       # run the analysis, save tables and charts
+python scripts/export_powerbi.py     # export CSVs for the Power BI dashboard
 ```
 
 To explore the data yourself:
@@ -106,10 +150,11 @@ python scripts/query.py "select customer_state, count(*) from fct_orders group b
 
 ```
 ├── data/raw/              source CSVs (git-ignored)
-├── docs/                  findings write-up
+├── docs/                  findings write-ups and Power BI build guide
 ├── outputs/
 │   ├── charts/            charts (PNG)
 │   └── tables/            analysis results (CSV)
+├── powerbi/               DAX measures, theme (data/ is generated and git-ignored)
 ├── scripts/               pipeline scripts
 └── sql/
     ├── staging/           cleaning views
@@ -121,7 +166,8 @@ python scripts/query.py "select customer_state, count(*) from fct_orders group b
 ## Roadmap
 
 - [x] **Phase 1:** data model, quality tests, exploratory SQL analysis
-- [ ] **Phase 2:** customer segmentation (RFM + clustering) and Power BI dashboard
+- [x] **Phase 2:** customer segmentation (RFM + clustering) and Power BI data model
+- [ ] **Phase 2b:** Power BI dashboard screenshots
 - [ ] **Phase 3:** repeat-purchase model with explainability, seller scorecard
 - [ ] **Phase 4:** review text analysis (NLP), demand forecasting, business memo
 

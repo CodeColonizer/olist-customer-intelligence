@@ -26,6 +26,7 @@ CHARTS_DIR = ROOT / "outputs" / "charts"
 # Chart styling: one primary hue, one highlight hue, recessive axes.
 BLUE = "#2a78d6"
 RED = "#e34948"
+ORANGE = "#eb6834"
 INK = "#0b0b0b"
 INK_2 = "#52514e"
 GRID = "#e4e3df"
@@ -149,6 +150,35 @@ def chart_categories(df: pd.DataFrame) -> None:
     plt.close(fig)
 
 
+def chart_share_comparison(df: pd.DataFrame, label_col: str, title: str,
+                           sub: str, filename: str) -> None:
+    """Grouped bars: each segment's share of customers vs share of revenue."""
+    d = df.iloc[::-1].reset_index(drop=True)
+    labels = [s.split(". ", 1)[-1] for s in d[label_col]]
+    y = range(len(d))
+    h = 0.36
+    fig, ax = plt.subplots(figsize=(10, 4.8))
+    ax.barh([i + h / 2 + 0.02 for i in y], d["customer_share_pct"], height=h,
+            color=BLUE, label="Share of customers")
+    ax.barh([i - h / 2 - 0.02 for i in y], d["revenue_share_pct"], height=h,
+            color=ORANGE, label="Share of revenue")
+    for i in y:
+        ax.text(d["customer_share_pct"][i] + 0.5, i + h / 2 + 0.02,
+                f"{d['customer_share_pct'][i]:.1f}%", va="center", color=INK_2, fontsize=9)
+        ax.text(d["revenue_share_pct"][i] + 0.5, i - h / 2 - 0.02,
+                f"{d['revenue_share_pct'][i]:.1f}%", va="center", color=INK_2, fontsize=9)
+    ax.set_yticks(list(y))
+    ax.set_yticklabels(labels)
+    ax.xaxis.set_major_formatter(mtick.PercentFormatter(decimals=0))
+    ax.set_xlim(0, max(d["customer_share_pct"].max(), d["revenue_share_pct"].max()) * 1.15)
+    ax.grid(axis="y", visible=False)
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.07), ncol=2, frameon=False)
+    ax.set_title(title, pad=22)
+    subtitle(ax, sub)
+    fig.savefig(CHARTS_DIR / filename)
+    plt.close(fig)
+
+
 def main() -> None:
     if not DB_PATH.exists():
         raise SystemExit("Database not found. Run load_raw.py and build.py first.")
@@ -163,6 +193,14 @@ def main() -> None:
     chart_seller_concentration(r["07_seller_concentration"])
     chart_state_delivery(r["09_state_delivery"])
     chart_categories(r["06_category_performance"])
+    chart_share_comparison(
+        r["11_rfm_segments"], "rfm_segment", "RFM segments: customers vs revenue",
+        "Recent = last order within ~6 months; big spenders = top 40% by total spend",
+        "07_rfm_segments.png")
+    chart_share_comparison(
+        r["12_customer_clusters"], "cluster_segment", "Behavioural segments: customers vs revenue",
+        "k-means clustering on recency, spend, reviews, delivery time and instalments",
+        "08_customer_clusters.png")
     for p in sorted(CHARTS_DIR.glob("*.png")):
         print(f"  saved  outputs/charts/{p.name}")
 

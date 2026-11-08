@@ -3,6 +3,9 @@ data/raw/*
 !data/raw/.gitkeep
 data/*.db
 
+# Generated Power BI input files (recreate with scripts/export_powerbi.py)
+powerbi/data/
+
 # Python
 __pycache__/
 *.pyc

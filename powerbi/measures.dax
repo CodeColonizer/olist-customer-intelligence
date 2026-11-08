@@ -1,0 +1,114 @@
+// =====================================================================
+// DAX measures for the Olist Customer Intelligence dashboard
+// Create a blank table called _Measures (Home > Enter data > Load) and add
+// each measure to it (Modeling > New measure). Copy one block at a time.
+//
+// Definitions match the SQL analysis:
+//   Revenue = product price excluding freight, delivered orders only
+//   Late    = delivered after the estimated delivery date
+// =====================================================================
+
+
+// ---------- Core volume ----------
+
+Orders =
+COUNTROWS ( fact_orders )
+
+Delivered Orders =
+CALCULATE ( COUNTROWS ( fact_orders ), fact_orders[is_delivered] = 1 )
+
+Revenue =
+CALCULATE ( SUM ( fact_orders[items_value] ), fact_orders[is_delivered] = 1 )
+
+Freight =
+CALCULATE ( SUM ( fact_orders[freight_value] ), fact_orders[is_delivered] = 1 )
+
+Average Order Value =
+DIVIDE ( [Revenue], [Delivered Orders] )
+
+Customers =
+CALCULATE (
+    DISTINCTCOUNT ( fact_orders[customer_unique_id] ),
+    fact_orders[is_delivered] = 1
+)
+
+
+// ---------- Growth (needs dim_date marked as the date table) ----------
+
+Revenue PY =
+CALCULATE ( [Revenue], SAMEPERIODLASTYEAR ( dim_date[date] ) )
+
+Revenue YoY % =
+DIVIDE ( [Revenue] - [Revenue PY], [Revenue PY] )
+
+
+// ---------- Delivery and satisfaction ----------
+
+Late Orders =
+CALCULATE ( COUNTROWS ( fact_orders ), fact_orders[is_late] = 1 )
+
+Late Delivery Rate =
+DIVIDE ( [Late Orders], [Delivered Orders] )
+
+Avg Delivery Days =
+CALCULATE ( AVERAGE ( fact_orders[delivery_days] ), fact_orders[is_delivered] = 1 )
+
+Avg Review Score =
+AVERAGE ( fact_orders[review_score] )
+
+Low Review Rate =
+// share of reviewed orders rated 1 or 2 stars
+DIVIDE (
+    CALCULATE ( COUNTROWS ( fact_orders ), fact_orders[is_low_review] = 1 ),
+    CALCULATE ( COUNTROWS ( fact_orders ), NOT ISBLANK ( fact_orders[review_score] ) )
+)
+
+Late Share of Low Reviews =
+// what share of all 1-2 star reviews came from late orders
+DIVIDE (
+    CALCULATE ( COUNTROWS ( fact_orders ), fact_orders[is_low_review] = 1, fact_orders[is_late] = 1 ),
+    CALCULATE ( COUNTROWS ( fact_orders ), fact_orders[is_low_review] = 1, fact_orders[is_delivered] = 1 )
+)
+
+
+// ---------- Customers and segments (dim_customers) ----------
+
+Segmented Customers =
+// customers with at least one delivered order
+CALCULATE ( COUNTROWS ( dim_customers ), dim_customers[order_count] > 0 )
+
+Returning Customers =
+CALCULATE ( COUNTROWS ( dim_customers ), dim_customers[is_returning_customer] = 1 )
+
+Returning Customer Rate =
+DIVIDE ( [Returning Customers], [Segmented Customers] )
+
+Customer Spend =
+SUM ( dim_customers[total_spend] )
+
+Share of Customers =
+DIVIDE (
+    [Segmented Customers],
+    CALCULATE ( [Segmented Customers], REMOVEFILTERS ( dim_customers ) )
+)
+
+Share of Customer Spend =
+DIVIDE (
+    [Customer Spend],
+    CALCULATE ( [Customer Spend], REMOVEFILTERS ( dim_customers ) )
+)
+
+
+// ---------- Sellers and categories (fact_order_items) ----------
+
+Item Revenue =
+CALCULATE ( SUM ( fact_order_items[price] ), fact_order_items[is_delivered] = 1 )
+
+Items Sold =
+CALCULATE ( COUNTROWS ( fact_order_items ), fact_order_items[is_delivered] = 1 )
+
+Active Sellers =
+CALCULATE ( DISTINCTCOUNT ( fact_order_items[seller_id] ), fact_order_items[is_delivered] = 1 )
+
+Share of Item Revenue =
+DIVIDE ( [Item Revenue], CALCULATE ( [Item Revenue], ALLSELECTED ( fact_order_items ) ) )

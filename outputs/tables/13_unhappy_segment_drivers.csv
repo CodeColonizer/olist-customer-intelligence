@@ -1,0 +1,16 @@
+top_category,all_customers,unhappy_customers,unhappy_rate_pct,over_representation_index
+office_furniture,1229,197,16.0,135.0
+telephony,3948,595,15.1,127.0
+computers_accessories,6306,917,14.5,123.0
+bed_bath_table,8786,1252,14.2,120.0
+unknown,1305,184,14.1,119.0
+furniture_decor,5888,791,13.4,113.0
+electronics,2441,309,12.7,107.0
+watches_gifts,5344,643,12.0,101.0
+home_appliances,674,80,11.9,100.0
+baby,2687,312,11.6,98.0
+garden_tools,3309,373,11.3,95.0
+consoles_games,995,111,11.2,94.0
+construction_tools_construction,706,79,11.2,94.0
+housewares,5481,615,11.2,95.0
+toys,3697,411,11.1,94.0

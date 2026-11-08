@@ -1,0 +1,6 @@
+rfm_segment,customers,customer_share_pct,revenue,revenue_share_pct,avg_spend,avg_recency_days,avg_review_score,experienced_late_pct
+1. Returning customers,2015,2.2,646295.04,4.2,320.74,192.0,4.29,10.6
+2. Recent big spenders,14499,15.5,4386086.99,28.4,302.51,92.0,4.13,6.7
+3. Recent small spenders,21754,23.3,1586785.66,10.3,72.94,90.0,4.25,6.3
+4. Lapsing big spenders,21187,22.7,6338915.02,41.1,299.19,336.0,4.03,8.3
+5. Lapsing small spenders,33895,36.3,2460312.12,16.0,72.59,338.0,4.16,6.4
