@@ -34,12 +34,29 @@ CALCULATE (
 
 
 // ---------- Growth (needs dim_date marked as the date table) ----------
+// The data ends in August 2018, so a plain SAMEPERIODLASTYEAR would compare
+// part of 2018 with all of 2017. These versions only compare dates up to the
+// last delivered purchase, so 2018 is compared with the same months of 2017.
 
 Revenue PY =
-CALCULATE ( [Revenue], SAMEPERIODLASTYEAR ( dim_date[date] ) )
+VAR LastSaleDate =
+    CALCULATE (
+        MAX ( fact_orders[purchase_date] ),
+        fact_orders[is_delivered] = 1,
+        REMOVEFILTERS ( dim_date )
+    )
+VAR DatesWithData =
+    FILTER ( VALUES ( dim_date[date] ), dim_date[date] <= LastSaleDate )
+RETURN
+    CALCULATE ( [Revenue], SAMEPERIODLASTYEAR ( DatesWithData ) )
 
 Revenue YoY % =
-DIVIDE ( [Revenue] - [Revenue PY], [Revenue PY] )
+// blank unless exactly one year is selected; 2017 vs 2016 is very large
+// because 2016 only has a few months of data
+IF (
+    HASONEVALUE ( dim_date[year] ),
+    DIVIDE ( [Revenue] - [Revenue PY], [Revenue PY] )
+)
 
 
 // ---------- Delivery and satisfaction ----------

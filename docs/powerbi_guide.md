@@ -54,6 +54,11 @@ dim_states ───┘                                       ◀── dim_sell
 
 Notes on the design:
 - Turn off **auto date/time** (File → Options → Data Load) so Power BI uses `dim_date`.
+- Turn off **relationship autodetect** in the same place (Current File → Data Load →
+  untick *Autodetect new relationships after data is loaded*). Several columns share
+  names across tables (`in_trend_window`, `is_delivered`, `order_status`, `category`),
+  and Power BI would otherwise link them automatically. Keep only the six relationships
+  above; see [Troubleshooting](#5-troubleshooting).
 - `dim_states` links to the order's delivery state. `dim_customers[home_state]` is kept
   as a plain column to avoid two filter paths to the same table.
 - Customer segment visuals use `dim_customers`, which holds lifetime figures, so they do
@@ -69,7 +74,21 @@ Format `Revenue` and `Average Order Value` as currency (R$), and the rates as pe
 
 ## 3. Build the pages
 
-Use a slicer row across the top of each page (year, region) and keep KPIs top left.
+**Slicers:** add two separate slicers across the top of each page, one for
+`dim_date[year]` and one for `dim_states[region]` (dropdown or tile style). Putting both
+fields in a single slicer causes a relationship error. Use **View → Sync slicers** so a
+selection carries across all pages.
+
+**KPI cards** (top left of each page), using Revenue as the example:
+1. Insert a **Card** visual (or "Card (new)") and add the `Revenue` measure.
+2. Select the measure in the Data pane and set **Measure tools → Format** to Currency
+   (R$, Portuguese (Brazil)), 0 decimal places. In the card's callout value settings,
+   set display units to Millions and 2 decimal places, so it shows R$13.22M.
+3. Turn on the title or category label and name it "Revenue".
+4. In the new card, add `Revenue YoY %` as a **reference label**, formatted as a
+   percentage (1 decimal) with conditional formatting: green above 0, red below.
+   It only shows a value when one year is selected; 2018 should show about +140%.
+5. Build the other cards the same way, then use **Format painter** to match the styling.
 
 ### Page 1: Executive overview
 
@@ -130,4 +149,25 @@ Power BI files cannot be previewed on GitHub, so:
 3. Optionally record a 30 to 60 second screen capture (clicking through slicers) and
    upload it as a GIF or link it from the README.
 
-Ask Claude to add the screenshots to the README once they are in the repo.
+Then add the screenshots to the README.
+
+## 5. Troubleshooting
+
+**"You are using fields that don't have a supported set of relationships"**
+Power BI cannot find one clear path between the tables in the visual. Check, in order:
+1. Each slicer uses one field only (year and region in separate slicers).
+2. In Model view, `dim_date[date] → fact_orders[purchase_date]` and
+   `dim_states[state_code] → fact_orders[customer_state]` both exist, are one-to-many
+   and single direction, and are drawn as **solid** lines. A dotted line is inactive:
+   double-click it and tick *Make this relationship active*.
+3. Delete any relationship that is not one of the six in section 2, especially links
+   Power BI created automatically on `in_trend_window`, `is_delivered`, `order_status`
+   or `category`. Then turn off relationship autodetect (section 2).
+4. `fact_orders[purchase_date]` and `dim_date[date]` are both type **Date**, not Text.
+
+**Year-on-year growth looks too low for 2018**
+Use the `Revenue PY` and `Revenue YoY %` measures from `measures.dax`, which compare
+2018 only with the same months of 2017 (the data ends in August 2018).
+
+**`Revenue YoY %` is blank**
+Expected unless exactly one year is selected in the year slicer.
