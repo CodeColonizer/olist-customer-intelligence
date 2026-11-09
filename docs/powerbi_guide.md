@@ -87,7 +87,8 @@ selection carries across all pages.
 3. Turn on the title or category label and name it "Revenue".
 4. In the new card, add `Revenue YoY %` as a **reference label**, formatted as a
    percentage (1 decimal) with conditional formatting: green above 0, red below.
-   It only shows a value when one year is selected; 2018 should show about +140%.
+   It only shows a value when one year is selected; 2018 should show about +145%
+   (Jan 1 to Aug 29 in both years, as the data ends on 29 August 2018).
 5. Build the other cards the same way, then use **Format painter** to match the styling.
 
 ### Page 1: Executive overview
