@@ -11,7 +11,7 @@ results saved in [`outputs/tables`](../outputs/tables).
 1. **The business more than doubled, then plateaued.** Revenue for Jan to Aug 2018 was
    141% higher than the same months of 2017, but monthly revenue has been flat at
    roughly R$0.83m to R$0.98m since early 2018.
-2. **Late delivery is the biggest driver of bad reviews.** Only 6.7% of delivered
+2. **Late delivery is the biggest driver of bad reviews.** Only 6.8% of delivered
    orders arrive late, yet they account for 32.5% of all 1 and 2 star reviews.
 3. **Almost nobody comes back.** Just 3.0% of customers placed more than one order,
    and only 2.2% bought on more than one day.
@@ -41,7 +41,7 @@ results saved in [`outputs/tables`](../outputs/tables).
   9% to 12% of the time.
 - That rises to 32% when an order is 1 to 3 days late, 68% at 4 to 7 days late, and
   79% at 8 or more days late. The average score falls from 4.32 to 1.70.
-- Late orders are 6.7% of delivered orders but 32.5% of low reviews.
+- Late orders are 6.8% of delivered orders but 32.5% of low reviews.
 - Estimates are very cautious: the average estimate is 23.7 days against an actual
   12.6 days, and 64% of orders arrive 10 or more days early.
 

@@ -13,7 +13,7 @@ business findings and recommendations.
 | | Finding |
 |---|---|
 | 📈 | Revenue grew **141% year on year** (Jan to Aug 2018 vs 2017), then **plateaued** at R$0.83m to R$0.98m a month. |
-| 🚚 | **Late orders are 6.7% of deliveries but 32.5% of 1-2 star reviews.** Low-review share jumps from ~10% when on time to 79% when 8+ days late. |
+| 🚚 | **Late orders are 6.8% of deliveries but 32.5% of 1-2 star reviews.** Low-review share jumps from ~10% when on time to 79% when 8+ days late. |
 | 🔁 | Only **3.0% of customers ever order again** (2.2% on a separate day), though repeat customers spend about twice as much. |
 | 🏪 | The **top 10% of sellers generate 67% of revenue**; sellers with 15%+ late rates average 3.68 stars vs 4.28 for the most reliable. |
 | 🗺️ | **Rio de Janeiro**, the second-largest market, has a 12.1% late rate, almost triple São Paulo's 4.5%. |
