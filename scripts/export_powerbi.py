@@ -9,6 +9,8 @@ Writes CSV files to powerbi/data/ (git-ignored; regenerate with this script):
   dim_products.csv      one row per product
   dim_states.csv        one row per Brazilian state, with region
   dim_date.csv          one row per calendar day (mark as date table in Power BI)
+  seller_scorecard.csv  one row per established seller: score and tier (phase 3)
+  customer_return_scores.csv  repeat-purchase scores for recent customers (phase 3)
 
 See docs/powerbi_guide.md for relationships, measures and page layouts.
 
@@ -127,6 +129,16 @@ QUERIES = {
         left join dim_states s on s.state_code = d.seller_state
     """,
     "dim_products": "select * from dim_products",
+    "seller_scorecard": """
+        select
+            seller_id, score, tier, score_rank,
+            late_dispatch_rate, cancellation_rate, low_review_rate
+        from mart_seller_scorecard
+    """,
+    "customer_return_scores": """
+        select customer_unique_id, return_probability, score_decile
+        from repeat_purchase_scores
+    """,
     "dim_states": """
         select
             state_code,
@@ -169,10 +181,12 @@ def build_date_table(con: sqlite3.Connection) -> pd.DataFrame:
 def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     with sqlite3.connect(DB_PATH) as con:
-        missing = {"customer_segments", "mart_customer_features"} - {
+        missing = {"customer_segments", "mart_customer_features",
+                   "mart_seller_scorecard", "repeat_purchase_scores"} - {
             r[0] for r in con.execute("select name from sqlite_master where type='table'")}
         if missing:
-            raise SystemExit("Run build.py and segment_customers.py first.")
+            raise SystemExit("Run build.py, segment_customers.py and "
+                             "train_repeat_model.py first.")
         for name, sql in QUERIES.items():
             df = tidy_integers(pd.read_sql_query(sql, con))
             df.to_csv(OUT_DIR / f"{name}.csv", index=False)

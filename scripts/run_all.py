@@ -4,8 +4,9 @@ Steps:
   1. load_raw.py           CSVs -> SQLite raw tables
   2. build.py              staging views, marts, data quality tests
   3. segment_customers.py  k-means customer segments
-  4. run_analysis.py       analysis tables and charts
-  5. export_powerbi.py     star-schema CSVs for Power BI
+  4. train_repeat_model.py repeat-purchase model, explainability, scores
+  5. run_analysis.py       analysis tables and charts
+  6. export_powerbi.py     star-schema CSVs for Power BI
 
 Usage:
     python scripts/run_all.py
@@ -19,6 +20,7 @@ STEPS = [
     "load_raw.py",
     "build.py",
     "segment_customers.py",
+    "train_repeat_model.py",
     "run_analysis.py",
     "export_powerbi.py",
 ]

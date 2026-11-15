@@ -51,6 +51,7 @@ plt.rcParams.update({
     "font.size": 10,
     "savefig.dpi": 150,
     "savefig.bbox": "tight",
+    "axes.axisbelow": True,
 })
 
 
@@ -151,15 +152,18 @@ def chart_categories(df: pd.DataFrame) -> None:
 
 
 def chart_share_comparison(df: pd.DataFrame, label_col: str, title: str,
-                           sub: str, filename: str) -> None:
-    """Grouped bars: each segment's share of customers vs share of revenue."""
+                           sub: str, filename: str,
+                           share_col: str = "customer_share_pct",
+                           share_label: str = "Share of customers") -> None:
+    """Grouped bars: each group's share of customers (or sellers) vs share of revenue."""
+    df = df.rename(columns={share_col: "customer_share_pct"})
     d = df.iloc[::-1].reset_index(drop=True)
     labels = [s.split(". ", 1)[-1] for s in d[label_col]]
     y = range(len(d))
     h = 0.36
     fig, ax = plt.subplots(figsize=(10, 4.8))
     ax.barh([i + h / 2 + 0.02 for i in y], d["customer_share_pct"], height=h,
-            color=BLUE, label="Share of customers")
+            color=BLUE, label=share_label)
     ax.barh([i - h / 2 - 0.02 for i in y], d["revenue_share_pct"], height=h,
             color=ORANGE, label="Share of revenue")
     for i in y:
@@ -201,6 +205,10 @@ def main() -> None:
         r["12_customer_clusters"], "cluster_segment", "Behavioural segments: customers vs revenue",
         "k-means clustering on recency, spend, reviews, delivery time and instalments",
         "08_customer_clusters.png")
+    chart_share_comparison(
+        r["15_seller_scorecard_tiers"], "tier", "Seller scorecard tiers: sellers vs revenue",
+        "Established sellers (30+ delivered orders), scored on delivery, dispatch, reviews and cancellations",
+        "11_seller_tiers.png", share_col="seller_share_pct", share_label="Share of sellers")
     for p in sorted(CHARTS_DIR.glob("*.png")):
         print(f"  saved  outputs/charts/{p.name}")
 

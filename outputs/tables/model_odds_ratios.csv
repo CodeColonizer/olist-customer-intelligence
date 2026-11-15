@@ -1,0 +1,17 @@
+feature,odds_ratio_per_sd
+Orders in first basket,1.104
+Instalments,1.1
+Freight cost,1.095
+Review score,1.074
+Wrote a review comment,1.059
+Freight share of basket,1.04
+Delivered late,1.038
+Sellers in first basket,1.017
+Items in first basket,1.015
+Left no review,0.976
+Day of week,0.973
+Days late (vs promise),0.963
+Hour of purchase,0.954
+Basket value,0.951
+Promised delivery time,0.949
+Delivery time,0.93

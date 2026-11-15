@@ -173,6 +173,16 @@ instalment buyers" group of 16% of customers generates 36% of spend.
 
 **Headline to show:** sellers with high late rates cluster in the low-review corner of the scatter.
 
+### Optional: phase 3 tables
+
+Two extra files come from phase 3. Load them and relate them to the existing tables
+(one-to-one, single direction) to add the scorecard and return scores to your pages:
+
+| File | Relationship | Ideas |
+|---|---|---|
+| `seller_scorecard.csv` | `seller_scorecard[seller_id]` → `dim_sellers[seller_id]` | add `score` and `tier` to the page 4 watchlist; colour the scatter by tier |
+| `customer_return_scores.csv` | `customer_return_scores[customer_unique_id]` → `dim_customers[customer_unique_id]` | a "follow-up campaign" table of top-decile recent customers on page 3 |
+
 ## 4. Publish it to GitHub
 
 Power BI files cannot be previewed on GitHub, so:

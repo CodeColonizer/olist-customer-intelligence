@@ -34,6 +34,18 @@ business findings and recommendations.
 
 ➡️ **Full write-up: [docs/phase2_findings.md](docs/phase2_findings.md)**
 
+### Phase 3: repeat-purchase model and seller scorecard
+
+| | Finding |
+|---|---|
+| 🔮 | A model of **who buys again within 180 days** reaches a test **AUC of 0.58** (95% CI 0.56 to 0.61): real but weak signal. Its top 10% return at **1.7x** the average. Logistic regression beat gradient boosting. |
+| ⏱️ | Customers whose first order arrived **within a week return 46% more often** than those who waited 21+ days (2.21% vs 1.51%). |
+| 📦 | **Half of established-seller revenue sits with underperforming sellers**, and late dispatch (a seller-controlled metric) is 11 times higher in the "At risk" tier than among top performers. |
+
+![Seller scorecard tiers](outputs/charts/11_seller_tiers.png)
+
+➡️ **Full write-up: [docs/phase3_findings.md](docs/phase3_findings.md)**
+
 ### Power BI dashboard
 
 A four-page dashboard built on an exported star schema, with DAX measures (including
@@ -57,10 +69,14 @@ visual. Download **[olist_dashboard.pbix](powerbi/olist_dashboard.pbix)** to exp
 
 - **SQL data modelling:** a layered model (raw → staging → marts) with fact and
   dimension tables, window functions, CTEs and deduplication logic.
-- **Data quality testing:** 14 automated tests (uniqueness, referential integrity,
+- **Data quality testing:** 16 automated tests (uniqueness, referential integrity,
   revenue reconciliation, valid ranges) that run on every build.
 - **Customer segmentation:** RFM scoring adapted for a low-repeat marketplace, plus
   k-means clustering in Python (scikit-learn) with a documented choice of k.
+- **Predictive modelling:** a leakage-safe repeat-purchase model with a time-based split,
+  cross-validated regularisation, bootstrapped confidence intervals, lift analysis and
+  permutation-importance explainability, honestly reported as a weak signal.
+- **Scorecard design:** a weighted, percentile-based seller score and tiers in SQL.
 - **BI modelling:** a Power BI star schema, date table and DAX measures (YoY growth,
   late share of low reviews, segment share of spend).
 - **Analytical judgement:** e.g. separating same-day split baskets from genuine return
@@ -80,11 +96,13 @@ data/raw/*.csv ──load_raw.py──▶ raw_* tables (as-is copies of the sour
           fct_orders · fct_order_items · dim_customers · dim_sellers · dim_products
           dim_geolocation · dim_states · mart_customer_features (RFM)
                                    │
-                         sql/tests ▼  14 data quality checks (build fails if any fail)
+                         sql/tests ▼  16 data quality checks (build fails if any fail)
                                    │
               segment_customers.py ▼  k-means segments → customer_segments
                                    │
-                      sql/analysis ▼  13 business questions → outputs/tables + outputs/charts
+             train_repeat_model.py ▼  repeat-purchase model → repeat_purchase_scores
+                                   │
+                      sql/analysis ▼  15 business questions → outputs/tables + outputs/charts
                                    │
                  export_powerbi.py ▼  star-schema CSVs → Power BI dashboard
 ```
@@ -100,6 +118,9 @@ data/raw/*.csv ──load_raw.py──▶ raw_* tables (as-is copies of the sour
 | `dim_states` | one row per state | state names and macro-regions |
 | `mart_customer_features` | one row per customer | segmentation features, RFM scores and segments |
 | `customer_segments` | one row per customer | k-means behavioural segment (from Python) |
+| `mart_repeat_purchase` | one row per customer | first-purchase features and 180-day return label |
+| `repeat_purchase_scores` | one row per recent customer | model-predicted probability of returning (from Python) |
+| `mart_seller_scorecard` | one row per established seller | 0-100 performance score and tier |
 
 ### Data cleaning decisions
 
@@ -127,6 +148,8 @@ data/raw/*.csv ──load_raw.py──▶ raw_* tables (as-is copies of the sour
 | 11 | What are the RFM segments worth? | [11_rfm_segments](sql/analysis/11_rfm_segments.sql) |
 | 12 | What do the behavioural segments look like? | [12_customer_clusters](sql/analysis/12_customer_clusters.sql) |
 | 13 | Which categories over-index among unhappy customers? | [13_unhappy_segment_drivers](sql/analysis/13_unhappy_segment_drivers.sql) |
+| 14 | Which first-purchase factors are linked to returning? | [14_repeat_purchase_drivers](sql/analysis/14_repeat_purchase_drivers.sql) |
+| 15 | How do seller scorecard tiers compare? | [15_seller_scorecard_tiers](sql/analysis/15_seller_scorecard_tiers.sql) |
 
 ## How to run it
 
@@ -149,6 +172,7 @@ or step by step:
 python scripts/load_raw.py           # load CSVs into data/olist.db (SQLite)
 python scripts/build.py              # build models and run the data quality tests
 python scripts/segment_customers.py  # k-means customer segmentation
+python scripts/train_repeat_model.py # repeat-purchase model and scores
 python scripts/run_analysis.py       # run the analysis, save tables and charts
 python scripts/export_powerbi.py     # export CSVs for the Power BI dashboard
 ```
@@ -180,7 +204,7 @@ python scripts/query.py "select customer_state, count(*) from fct_orders group b
 
 - [x] **Phase 1:** data model, quality tests, exploratory SQL analysis
 - [x] **Phase 2:** customer segmentation (RFM + clustering) and Power BI dashboard
-- [ ] **Phase 3:** repeat-purchase model with explainability, seller scorecard
+- [x] **Phase 3:** repeat-purchase model with explainability, seller scorecard
 - [ ] **Phase 4:** review text analysis (NLP), demand forecasting, business memo
 
 ## Data source

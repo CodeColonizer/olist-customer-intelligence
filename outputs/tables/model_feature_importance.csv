@@ -1,0 +1,20 @@
+feature,auc_drop,auc_drop_std
+Product category,0.0193,0.0052
+Instalments,0.0122,0.0044
+Region,0.0122,0.0042
+Hour of purchase,0.0108,0.0019
+Delivery time,0.0103,0.0052
+Review score,0.009,0.0067
+Promised delivery time,0.0084,0.0022
+Freight cost,0.0074,0.0052
+Orders in first basket,0.0052,0.002
+Delivered late,0.0048,0.0037
+Basket value,0.0044,0.0027
+Payment method,0.0031,0.0013
+Items in first basket,0.003,0.0011
+Wrote a review comment,0.0025,0.0038
+Left no review,0.0023,0.0016
+Day of week,0.001,0.0018
+Freight share of basket,0.0007,0.0022
+Sellers in first basket,0.0,0.0012
+Days late (vs promise),-0.0006,0.0024

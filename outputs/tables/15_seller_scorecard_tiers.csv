@@ -1,0 +1,5 @@
+tier,sellers,seller_share_pct,revenue,revenue_share_pct,avg_score,avg_late_delivery_pct,avg_late_dispatch_pct,avg_low_review_pct,avg_cancellation_pct,avg_review_score
+1. Top performer,129,20.6,1229271.52,12.1,83.7,2.2,2.4,6.5,0.08,4.44
+2. Solid,238,38.0,3862741.94,37.9,61.6,5.2,5.5,10.9,0.26,4.23
+3. Needs improvement,205,32.7,4312702.44,42.3,38.9,8.6,13.1,16.1,0.46,4.02
+4. At risk,55,8.8,793975.26,7.8,17.3,14.7,27.1,25.6,1.09,3.66

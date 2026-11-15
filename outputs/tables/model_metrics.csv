@@ -1,0 +1,4 @@
+model,test_roc_auc,auc_95ci_low,auc_95ci_high,test_pr_auc,base_rate,top10pct_return_rate,top10pct_lift,top20pct_share_of_returners
+No-skill baseline,0.5,0.5,0.5,0.0181,0.0181,0.0181,1.0,0.198
+Logistic regression,0.582,0.56,0.606,0.0247,0.0181,0.0306,1.69,0.294
+Gradient boosting,0.56,0.536,0.584,0.0237,0.0181,0.0283,1.56,0.281
