@@ -36,9 +36,21 @@ business findings and recommendations.
 
 ### Power BI dashboard
 
-A four-page dashboard (executive overview, delivery and satisfaction, customer segments,
-seller scorecard) built on an exported star schema, with DAX measures and a custom theme.
-See the **[build guide](docs/powerbi_guide.md)** and the [`powerbi`](powerbi) folder.
+A four-page dashboard built on an exported star schema, with DAX measures (including
+like-for-like year-on-year growth), a custom theme and Power BI's **Key influencers** AI
+visual. See the **[build guide](docs/powerbi_guide.md)** and the [`powerbi`](powerbi) folder.
+
+**1. Executive overview:** growth, then a 2018 plateau
+![Executive overview](powerbi/screenshots/page1_overview.png)
+
+**2. Delivery and satisfaction:** the AI Key influencers visual independently identifies late delivery as the top driver of 1-2 star reviews
+![Delivery and satisfaction](powerbi/screenshots/page2_delivery.png)
+
+**3. Customer segments:** RFM and k-means segments, customers vs share of spend
+![Customer segments](powerbi/screenshots/page3_customers.png)
+
+**4. Seller scorecard:** late delivery vs review score, with a watchlist of high-risk sellers
+![Seller scorecard](powerbi/screenshots/page4_sellers.png)
 
 ## What this project demonstrates
 
@@ -166,8 +178,7 @@ python scripts/query.py "select customer_state, count(*) from fct_orders group b
 ## Roadmap
 
 - [x] **Phase 1:** data model, quality tests, exploratory SQL analysis
-- [x] **Phase 2:** customer segmentation (RFM + clustering) and Power BI data model
-- [ ] **Phase 2b:** Power BI dashboard screenshots
+- [x] **Phase 2:** customer segmentation (RFM + clustering) and Power BI dashboard
 - [ ] **Phase 3:** repeat-purchase model with explainability, seller scorecard
 - [ ] **Phase 4:** review text analysis (NLP), demand forecasting, business memo
 
