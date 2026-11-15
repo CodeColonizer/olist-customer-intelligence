@@ -86,7 +86,8 @@ def name_clusters(profile: pd.DataFrame) -> dict[int, str]:
 
 
 def chart_selection(sel: pd.DataFrame) -> None:
-    plt.rcParams.update({"font.size": 10, "savefig.dpi": 150, "savefig.bbox": "tight"})
+    plt.rcParams.update({"font.family": ["Inter", "DejaVu Sans"], "font.size": 10,
+                         "savefig.dpi": 150, "savefig.bbox": "tight"})
     fig, ax = plt.subplots(figsize=(10, 4))
     fig.patch.set_facecolor(SURFACE)
     ax.set_facecolor(SURFACE)

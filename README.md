@@ -6,6 +6,8 @@ business findings and recommendations.
 
 **Business question:** *Where is the marketplace losing revenue and customer goodwill, and what should it fix first?*
 
+📄 **Short answer: the one-page [business memo](docs/business_memo.md).**
+
 ## Key findings
 
 ### Phase 1: performance and service
@@ -46,6 +48,18 @@ business findings and recommendations.
 
 ➡️ **Full write-up: [docs/phase3_findings.md](docs/phase3_findings.md)**
 
+### Phase 4: review text analysis and demand forecasting
+
+| | Finding |
+|---|---|
+| 💬 | Analysing **8,440 Portuguese review comments** shows the two unhappy segments have different problems: **delivery-failure detractors are still waiting** (55% say the order hasn't arrived), while customers **unhappy despite good delivery got the wrong thing or not all of it** (27% order accuracy, 25% product issues). |
+| 📦 | **On-time orders with several items from several sellers get 1-2 stars 47% of the time,** against 7.5% for single items; 59% of the complaints say items were missing. Fixing this is worth about **12.5% of all low reviews**. |
+| 📈 | In a backtest of five forecasting methods, **"same as last month" matched exponential smoothing and beat trend models**, which over-forecast by projecting 2017's growth. Demand is flat at **~7,200 items a month**, with up to **1.6x in November** for Black Friday. |
+
+![Complaint themes by segment](outputs/charts/12_complaint_themes.png)
+
+➡️ **Full write-up: [docs/phase4_findings.md](docs/phase4_findings.md)**
+
 ### Power BI dashboard
 
 A four-page dashboard built on an exported star schema, with DAX measures (including
@@ -69,7 +83,7 @@ visual. Download **[olist_dashboard.pbix](powerbi/olist_dashboard.pbix)** to exp
 
 - **SQL data modelling:** a layered model (raw → staging → marts) with fact and
   dimension tables, window functions, CTEs and deduplication logic.
-- **Data quality testing:** 16 automated tests (uniqueness, referential integrity,
+- **Data quality testing:** 18 automated tests (uniqueness, referential integrity,
   revenue reconciliation, valid ranges) that run on every build.
 - **Customer segmentation:** RFM scoring adapted for a low-repeat marketplace, plus
   k-means clustering in Python (scikit-learn) with a documented choice of k.
@@ -77,12 +91,18 @@ visual. Download **[olist_dashboard.pbix](powerbi/olist_dashboard.pbix)** to exp
   cross-validated regularisation, bootstrapped confidence intervals, lift analysis and
   permutation-importance explainability, honestly reported as a weak signal.
 - **Scorecard design:** a weighted, percentile-based seller score and tiers in SQL.
+- **Text analysis (NLP):** complaint themes extracted from Portuguese review text with
+  transparent rules, validated against a hand-labelled sample (precision and recall per
+  theme), plus a weighted log-odds comparison of vocabulary between segments.
+- **Forecasting:** a rolling-origin backtest of five methods, prediction intervals from
+  backtest errors, and an explicit Black Friday scenario instead of a model that can't learn it.
 - **BI modelling:** a Power BI star schema, date table and DAX measures (YoY growth,
   late share of low reviews, segment share of spend).
 - **Analytical judgement:** e.g. separating same-day split baskets from genuine return
   visits, limiting trends to complete months, and choosing 5 clusters over the
   statistically "best" 3 because they lead to different actions.
-- **Communication:** findings written for a business audience, with clear caveats.
+- **Communication:** findings written for a business audience, with clear caveats, and a
+  one-page memo with prioritised, owned and measurable recommendations.
 
 ## Data model
 
@@ -95,14 +115,20 @@ data/raw/*.csv ──load_raw.py──▶ raw_* tables (as-is copies of the sour
                          sql/marts ▼  analysis-ready tables
           fct_orders · fct_order_items · dim_customers · dim_sellers · dim_products
           dim_geolocation · dim_states · mart_customer_features (RFM)
+          mart_repeat_purchase · mart_seller_scorecard · mart_review_comments
+          mart_category_demand
                                    │
-                         sql/tests ▼  16 data quality checks (build fails if any fail)
+                         sql/tests ▼  18 data quality checks (build fails if any fail)
                                    │
               segment_customers.py ▼  k-means segments → customer_segments
                                    │
              train_repeat_model.py ▼  repeat-purchase model → repeat_purchase_scores
                                    │
-                      sql/analysis ▼  15 business questions → outputs/tables + outputs/charts
+                analyse_reviews.py ▼  complaint themes from review text → review_themes
+                                   │
+                forecast_demand.py ▼  backtest + category forecasts → demand_forecasts
+                                   │
+                      sql/analysis ▼  19 business questions → outputs/tables + outputs/charts
                                    │
                  export_powerbi.py ▼  star-schema CSVs → Power BI dashboard
 ```
@@ -121,6 +147,10 @@ data/raw/*.csv ──load_raw.py──▶ raw_* tables (as-is copies of the sour
 | `mart_repeat_purchase` | one row per customer | first-purchase features and 180-day return label |
 | `repeat_purchase_scores` | one row per recent customer | model-predicted probability of returning (from Python) |
 | `mart_seller_scorecard` | one row per established seller | 0-100 performance score and tier |
+| `mart_review_comments` | one row per order with a review comment | review text with delivery, basket and category context |
+| `review_themes` | one row per complaint per theme | complaint themes in 1-2 star comments (from Python) |
+| `mart_category_demand` | one row per category per month | items ordered, for forecasting |
+| `demand_forecasts` | one row per series per forecast month | Sep-Nov 2018 forecasts, 80% ranges, Black Friday scenario (from Python) |
 
 ### Data cleaning decisions
 
@@ -150,6 +180,10 @@ data/raw/*.csv ──load_raw.py──▶ raw_* tables (as-is copies of the sour
 | 13 | Which categories over-index among unhappy customers? | [13_unhappy_segment_drivers](sql/analysis/13_unhappy_segment_drivers.sql) |
 | 14 | Which first-purchase factors are linked to returning? | [14_repeat_purchase_drivers](sql/analysis/14_repeat_purchase_drivers.sql) |
 | 15 | How do seller scorecard tiers compare? | [15_seller_scorecard_tiers](sql/analysis/15_seller_scorecard_tiers.sql) |
+| 16 | What do the two unhappy segments complain about? | [16_review_complaint_themes](sql/analysis/16_review_complaint_themes.sql) |
+| 17 | Do multi-item orders get worse reviews even when on time? | [17_low_reviews_by_basket](sql/analysis/17_low_reviews_by_basket.sql) |
+| 18 | Which categories are growing, and what is the demand outlook? | [18_category_demand_trends](sql/analysis/18_category_demand_trends.sql) |
+| 19 | What goes wrong in each category for customers unhappy despite good delivery? | [19_complaint_themes_by_category](sql/analysis/19_complaint_themes_by_category.sql) |
 
 ## How to run it
 
@@ -173,6 +207,8 @@ python scripts/load_raw.py           # load CSVs into data/olist.db (SQLite)
 python scripts/build.py              # build models and run the data quality tests
 python scripts/segment_customers.py  # k-means customer segmentation
 python scripts/train_repeat_model.py # repeat-purchase model and scores
+python scripts/analyse_reviews.py    # complaint themes from review text
+python scripts/forecast_demand.py    # demand forecast backtest and forecasts
 python scripts/run_analysis.py       # run the analysis, save tables and charts
 python scripts/export_powerbi.py     # export CSVs for the Power BI dashboard
 ```
@@ -186,8 +222,10 @@ python scripts/query.py "select customer_state, count(*) from fct_orders group b
 ## Project structure
 
 ```
-├── data/raw/              source CSVs (git-ignored)
-├── docs/                  findings write-ups and Power BI build guide
+├── data/
+│   ├── raw/               source CSVs (git-ignored)
+│   └── labels/            hand-labelled review sample used to validate the text analysis
+├── docs/                  business memo, findings write-ups and Power BI build guide
 ├── outputs/
 │   ├── charts/            charts (PNG)
 │   └── tables/            analysis results (CSV)
@@ -205,7 +243,7 @@ python scripts/query.py "select customer_state, count(*) from fct_orders group b
 - [x] **Phase 1:** data model, quality tests, exploratory SQL analysis
 - [x] **Phase 2:** customer segmentation (RFM + clustering) and Power BI dashboard
 - [x] **Phase 3:** repeat-purchase model with explainability, seller scorecard
-- [ ] **Phase 4:** review text analysis (NLP), demand forecasting, business memo
+- [x] **Phase 4:** review text analysis (NLP), demand forecasting, business memo
 
 ## Data source
 

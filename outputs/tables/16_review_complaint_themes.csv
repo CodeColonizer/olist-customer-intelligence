@@ -1,0 +1,15 @@
+theme_group,theme,delivery_failure_comments,delivery_failure_pct,good_delivery_comments,good_delivery_pct,good_delivery_written_before_delivery_pct
+1. Delivery,Not received (yet),1289,54.9,1052,17.3,29.5
+1. Delivery,Late or slow delivery,547,23.3,392,6.4,28.3
+1. Delivery,Had to collect from post office,24,1.0,88,1.4,6.8
+1. Delivery,Any delivery issue,1617,68.9,1429,23.5,25.6
+2. Order accuracy,Items or parts missing,85,3.6,1146,18.8,1.3
+2. Order accuracy,Wrong item sent,42,1.8,560,9.2,0.5
+2. Order accuracy,Any order accuracy issue,125,5.3,1669,27.4,1.0
+3. Product,Poor quality or not as described,82,3.5,909,14.9,0.6
+3. Product,Defective or damaged,46,2.0,729,12.0,0.1
+3. Product,Any product issue,122,5.2,1534,25.2,0.4
+4. Service,"Wants refund, return or exchange",151,6.4,858,14.1,4.4
+4. Service,No response or poor support,251,10.7,352,5.8,9.9
+4. Service,Any service issue,381,16.2,1112,18.3,6.5
+5. All,Any theme,1905,81.1,4652,76.4,8.7

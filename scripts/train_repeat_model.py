@@ -84,7 +84,8 @@ plt.rcParams.update({
     "axes.titleweight": "bold", "axes.titlelocation": "left",
     "axes.spines.top": False, "axes.spines.right": False, "axes.grid": True,
     "grid.color": GRID, "grid.linewidth": 0.8, "xtick.color": INK_2, "ytick.color": INK_2,
-    "font.size": 10, "savefig.dpi": 150, "savefig.bbox": "tight", "axes.axisbelow": True,
+    "font.family": ["Inter", "DejaVu Sans"], "font.size": 10,
+    "savefig.dpi": 150, "savefig.bbox": "tight", "axes.axisbelow": True,
 })
 
 

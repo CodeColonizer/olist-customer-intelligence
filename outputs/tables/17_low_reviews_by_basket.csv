@@ -1,0 +1,4 @@
+basket_type,on_time_orders,order_share_pct,low_reviews,low_review_pct,share_of_low_reviews_pct,missing_items_pct
+1. Single item,80407,89.9,6067,7.5,73.2,6.0
+"2. Several items, one seller",7787,8.7,1636,21.0,19.7,58.8
+"3. Several items, several sellers",1249,1.4,586,46.9,7.1,59.6

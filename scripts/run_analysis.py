@@ -48,6 +48,7 @@ plt.rcParams.update({
     "grid.linewidth": 0.8,
     "xtick.color": INK_2,
     "ytick.color": INK_2,
+    "font.family": ["Inter", "DejaVu Sans"],   # Inter if installed, else matplotlib's default
     "font.size": 10,
     "savefig.dpi": 150,
     "savefig.bbox": "tight",
@@ -183,6 +184,56 @@ def chart_share_comparison(df: pd.DataFrame, label_col: str, title: str,
     plt.close(fig)
 
 
+def chart_complaint_themes(df: pd.DataFrame) -> None:
+    """Grouped bars: share of each unhappy segment's complaints mentioning each theme."""
+    d = df[~df["theme"].str.startswith("Any ")].iloc[::-1].reset_index(drop=True)
+    y = range(len(d))
+    h = 0.36
+    fig, ax = plt.subplots(figsize=(10, 5.6))
+    ax.barh([i + h / 2 + 0.02 for i in y], d["delivery_failure_pct"], height=h,
+            color=RED, label="Delivery-failure detractors")
+    ax.barh([i - h / 2 - 0.02 for i in y], d["good_delivery_pct"], height=h,
+            color=BLUE, label="Unhappy despite good delivery")
+    for i in y:
+        ax.text(d["delivery_failure_pct"][i] + 0.6, i + h / 2 + 0.02,
+                f"{d['delivery_failure_pct'][i]:.0f}%", va="center", color=INK_2, fontsize=9)
+        ax.text(d["good_delivery_pct"][i] + 0.6, i - h / 2 - 0.02,
+                f"{d['good_delivery_pct'][i]:.0f}%", va="center", color=INK_2, fontsize=9)
+    ax.set_yticks(list(y))
+    ax.set_yticklabels(d["theme"])
+    # thin separators between theme groups
+    groups = d["theme_group"].tolist()
+    for i in range(1, len(groups)):
+        if groups[i] != groups[i - 1]:
+            ax.axhline(i - 0.5, color=GRID, linewidth=0.8)
+    ax.xaxis.set_major_formatter(mtick.PercentFormatter(decimals=0))
+    ax.set_xlim(0, d["delivery_failure_pct"].max() * 1.12)
+    ax.grid(axis="y", visible=False)
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.07), ncol=2, frameon=False)
+    ax.set_title("What unhappy customers complain about", pad=22)
+    subtitle(ax, "Share of 1-2 star review comments mentioning each theme (a comment can mention several)")
+    fig.savefig(CHARTS_DIR / "12_complaint_themes.png")
+    plt.close(fig)
+
+
+def chart_low_reviews_by_basket(df: pd.DataFrame) -> None:
+    labels = [f"{s.split('. ', 1)[1]}\n({n:.0f}% of on-time orders)"
+              for s, n in zip(df["basket_type"], df["order_share_pct"])]
+    colors = [BLUE, ORANGE, RED]
+    fig, ax = plt.subplots(figsize=(10, 4.2))
+    bars = ax.bar(labels, df["low_review_pct"], color=colors, width=0.55)
+    for bar, v in zip(bars, df["low_review_pct"]):
+        ax.text(bar.get_x() + bar.get_width() / 2, v + 1.2, f"{v:.0f}%",
+                ha="center", color=INK, fontsize=9.5)
+    ax.yaxis.set_major_formatter(mtick.PercentFormatter(decimals=0))
+    ax.set_ylim(0, 56)
+    ax.grid(axis="x", visible=False)
+    ax.set_title("Share of 1-2 star reviews for orders delivered on time", pad=22)
+    subtitle(ax, "Delivered on or before the estimated date, by what was in the order")
+    fig.savefig(CHARTS_DIR / "13_low_reviews_by_basket.png")
+    plt.close(fig)
+
+
 def main() -> None:
     if not DB_PATH.exists():
         raise SystemExit("Database not found. Run load_raw.py and build.py first.")
@@ -209,6 +260,8 @@ def main() -> None:
         r["15_seller_scorecard_tiers"], "tier", "Seller scorecard tiers: sellers vs revenue",
         "Established sellers (30+ delivered orders), scored on delivery, dispatch, reviews and cancellations",
         "11_seller_tiers.png", share_col="seller_share_pct", share_label="Share of sellers")
+    chart_complaint_themes(r["16_review_complaint_themes"])
+    chart_low_reviews_by_basket(r["17_low_reviews_by_basket"])
     for p in sorted(CHARTS_DIR.glob("*.png")):
         print(f"  saved  outputs/charts/{p.name}")
 

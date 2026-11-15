@@ -1,0 +1,16 @@
+category,complaints,missing_items_pct,wrong_item_pct,defective_pct,poor_quality_pct,top_theme
+bed_bath_table,730,18.9,7.8,2.7,24.9,Poor quality or not as described
+computers_accessories,526,17.5,10.1,17.7,14.3,Defective or damaged
+health_beauty,449,14.7,14.5,8.5,11.1,Items or parts missing
+furniture_decor,419,27.4,6.9,8.6,14.3,Items or parts missing
+sports_leisure,416,21.4,7.2,6.7,9.4,Items or parts missing
+housewares,360,24.4,6.1,13.1,12.5,Items or parts missing
+watches_gifts,357,11.5,7.3,16.2,21.0,Poor quality or not as described
+telephony,332,12.3,11.1,20.2,14.2,Defective or damaged
+auto,230,15.7,12.6,13.0,12.2,Items or parts missing
+toys,199,14.1,11.1,16.6,21.6,Poor quality or not as described
+garden_tools,198,33.3,5.6,14.6,5.1,Items or parts missing
+electronics,177,16.4,6.8,23.7,8.5,Defective or damaged
+cool_stuff,174,12.6,3.4,16.1,20.1,Poor quality or not as described
+perfumery,168,14.9,10.1,7.7,14.3,Items or parts missing
+baby,152,21.7,13.8,10.5,15.1,Items or parts missing

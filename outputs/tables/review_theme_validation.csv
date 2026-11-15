@@ -1,0 +1,10 @@
+theme_group,theme,hand_labelled,rule_tagged,agreed,precision,recall,f1,hand_pct_delivery_failure,hand_pct_good_delivery
+1. Delivery,Not received (yet),85,71,65,0.92,0.76,0.83,67.0,18.0
+1. Delivery,Late or slow delivery,49,37,32,0.86,0.65,0.74,37.0,12.0
+1. Delivery,Had to collect from post office,8,5,5,1.0,0.62,0.77,4.0,4.0
+2. Order accuracy,Items or parts missing,26,22,21,0.95,0.81,0.88,4.0,22.0
+2. Order accuracy,Wrong item sent,16,11,11,1.0,0.69,0.81,2.0,14.0
+3. Product,Defective or damaged,22,21,20,0.95,0.91,0.93,2.0,20.0
+3. Product,Poor quality or not as described,23,16,12,0.75,0.52,0.62,3.0,20.0
+4. Service,No response or poor support,36,22,20,0.91,0.56,0.69,24.0,12.0
+4. Service,"Wants refund, return or exchange",17,17,17,1.0,1.0,1.0,3.0,14.0

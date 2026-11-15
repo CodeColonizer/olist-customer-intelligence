@@ -1,0 +1,6 @@
+method,wape_pct,bias_pct,wape_h1_pct,wape_h2_pct,wape_h3_pct,total_wape_pct
+Naive (last month),20.7,6.1,14.5,21.5,26.6,8.0
+Exponential smoothing,20.9,5.8,15.1,21.5,26.4,7.4
+3-month moving average,23.6,3.7,19.0,23.5,28.5,8.3
+Top-down (total x recent share),24.2,8.1,18.7,24.1,30.2,9.9
+Damped trend,24.4,14.3,16.9,25.2,31.6,9.9
