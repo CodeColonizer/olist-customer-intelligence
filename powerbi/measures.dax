@@ -87,6 +87,16 @@ DIVIDE (
     CALCULATE ( COUNTROWS ( fact_orders ), fact_orders[is_low_review] = 1, fact_orders[is_delivered] = 1 )
 )
 
+Timing Bar Colour =
+// used for conditional formatting (Field value) on the delivery timing chart:
+// late buckets red, on-time and early buckets blue.
+// Needs the Delivery Timing Order calculated column (see powerbi_guide.md)
+IF (
+    SELECTEDVALUE ( fact_orders[Delivery Timing Order] ) >= 4,
+    "#e34948",
+    "#2a78d6"
+)
+
 
 // ---------- Customers and segments (dim_customers) ----------
 

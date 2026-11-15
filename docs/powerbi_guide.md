@@ -107,10 +107,41 @@ selection carries across all pages.
 | Visual | Fields |
 |---|---|
 | KPI cards | Late Delivery Rate, Avg Delivery Days, Low Review Rate, Late Share of Low Reviews |
-| Column chart | X: fact_orders[delivery_timing] · Y: Low Review Rate |
+| Column chart | X: fact_orders[Delivery Timing Label] · Y: Low Review Rate |
 | Filled map | Location: dim_states[map_location] · Colour saturation: Late Delivery Rate |
 | Table | dim_states[state_name], Delivered Orders, Avg Delivery Days, Late Delivery Rate, Avg Review Score |
-| **Key influencers** (AI visual) | Analyze: fact_orders[is_low_review] · Explain by: delivery_timing, dim_states[region], primary_payment_type, item_count, freight_value |
+| **Key influencers** (AI visual) | Analyze: fact_orders[is_low_review] · Explain by: Delivery Timing Label, dim_states[region], primary_payment_type, item_count, freight_value |
+
+**Page filter:** add `is_delivered = 1` under *Filters on this page*. Undelivered orders
+have no delivery timing (they would appear as a blank category) and 78% of their reviews
+are 1-2 stars, which would distort a page about delivery timing.
+
+**Clean timing labels.** `delivery_timing` values start with a number (`6. 8+ days late`)
+so they sort correctly. To show clean labels, add two calculated columns to `fact_orders`
+(Table tools → New column):
+
+```dax
+Delivery Timing Label =
+IF ( ISBLANK ( fact_orders[delivery_timing] ), BLANK (), MID ( fact_orders[delivery_timing], 4, 50 ) )
+
+Delivery Timing Order =
+IF ( ISBLANK ( fact_orders[delivery_timing] ), BLANK (), VALUE ( LEFT ( fact_orders[delivery_timing], 1 ) ) )
+```
+
+Then select `Delivery Timing Label` → **Column tools → Sort by column → Delivery Timing Order**,
+and sort the chart axis ascending (early on the left, late on the right).
+
+**Chart formatting:**
+- *Data labels:* Format visual → Data labels → On, position Outside end. Format the
+  `Low Review Rate` measure as a percentage with 0 decimals.
+- *Red late bars:* add the `Timing Bar Colour` measure from `measures.dax`, then
+  Format visual → Columns → Colors → **fx** → Format style *Field value* → based on
+  `Timing Bar Colour`.
+
+**Table conditional formatting:** in the Columns well, open the dropdown on a field →
+**Conditional formatting → Background color** → Format style *Gradient*:
+- *Late Delivery Rate:* lowest value `#ffffff`, highest value `#f19c9b` (worse = redder).
+- *Avg Review Score:* lowest value `#f19c9b`, highest value `#ffffff` (lower = redder).
 
 **Headline to show:** late orders are under 7% of deliveries but about a third of 1-2 star reviews.
 The Key influencers visual should independently surface delivery timing as the top driver,
