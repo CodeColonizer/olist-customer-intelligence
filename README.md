@@ -38,7 +38,8 @@ business findings and recommendations.
 
 A four-page dashboard built on an exported star schema, with DAX measures (including
 like-for-like year-on-year growth), a custom theme and Power BI's **Key influencers** AI
-visual. See the **[build guide](docs/powerbi_guide.md)** and the [`powerbi`](powerbi) folder.
+visual. Download **[olist_dashboard.pbix](powerbi/olist_dashboard.pbix)** to explore it in Power BI Desktop
+(free, Windows), or see the **[build guide](docs/powerbi_guide.md)** to rebuild it.
 
 **1. Executive overview:** growth, then a 2018 plateau
 ![Executive overview](powerbi/screenshots/page1_overview.png)
@@ -135,7 +136,7 @@ Requires Python 3.10+.
 pip install -r requirements.txt
 ```
 
-1. Download the [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) from Kaggle and put the 9 CSV files in `data/raw/`. (The data is not committed to this repo.)
+1. Download the [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) from Kaggle and put the 9 CSV files in `data/raw/`. (The raw CSVs are not committed to this repo; the .pbix file contains the modelled tables.)
 2. Run the whole pipeline with one command:
 
 ```bash
@@ -166,7 +167,7 @@ python scripts/query.py "select customer_state, count(*) from fct_orders group b
 ├── outputs/
 │   ├── charts/            charts (PNG)
 │   └── tables/            analysis results (CSV)
-├── powerbi/               DAX measures, theme (data/ is generated and git-ignored)
+├── powerbi/               dashboard (.pbix), screenshots, DAX measures, theme
 ├── scripts/               pipeline scripts
 └── sql/
     ├── staging/           cleaning views
